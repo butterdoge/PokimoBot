@@ -8,8 +8,8 @@ var configPath = "./config.json";
 if (!fs_1.default.existsSync(configPath)) {
     var defaultConfig = {
         app: {
-            nickname: "机器人昵称",
-            master: "主人用户名",
+            nickname: "Pokimo",
+            master: "SU",
             master_uid: '主人uid',
             color: "消息颜色"
         },

@@ -63,110 +63,186 @@ var path_1 = __importDefault(require("path"));
 var api = __importStar(require("../../lib/api"));
 var config_1 = __importDefault(require("../../config"));
 var logger_1 = __importDefault(require("../../lib/logger"));
+try {
+    fs_1.default.mkdirSync(path_1.default.join(__dirname, '../../data/word'));
+}
+catch (error) { }
+// 是否为管理员
+var isAdmin = function (name) {
+    var allowed = getOp();
+    if (allowed.op.includes(name)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+};
+// 获取词库列表
 var getWord = function () {
-    var wordPath = path_1.default.join(__dirname, "../../data/word/word.json");
+    var wordPath = path_1.default.join(__dirname, '../../data/word/word.json');
     if (!fs_1.default.existsSync(wordPath)) {
-        fs_1.default.writeFileSync(wordPath, "{}");
-        return {};
+        fs_1.default.writeFileSync(wordPath, '{}');
+        console.log('测试成功');
     }
     return JSON.parse(fs_1.default.readFileSync(wordPath).toString());
 };
-//苏苏的随机数生成姬
+// 获取权限列表
+var getOp = function () {
+    var opPath = path_1.default.join(__dirname, '../../data/word/op.json');
+    if (!fs_1.default.existsSync(opPath)) {
+        fs_1.default.writeFileSync(opPath, '{"op":[]}');
+    }
+    return JSON.parse(fs_1.default.readFileSync(opPath).toString());
+};
+// 苏苏的随机数生成姬
 var random = function (n, m) { return Math.floor(Math.random() * (m - n + 1) + n); };
-//更新json文件
-var update = function (file) {
+// 更新json文件
+var update = function (file, tyf) {
     try {
-        fs_1.default.writeFileSync(path_1.default.join(__dirname, path_1.default.join(__dirname, "../../data/word/word.json")), JSON.stringify(file));
-        logger_1.default("Word").info("词库文件写入成功");
+        fs_1.default.writeFileSync(path_1.default.join(__dirname, "../../data/word/" + tyf + ".json"), JSON.stringify(file, null, 3));
+        logger_1.default('Word').info('词库文件写入成功');
     }
     catch (error) {
-        logger_1.default("Word").warn("词库文件写入失败", error);
+        logger_1.default('Word').warn('词库文件写入失败', error);
     }
 };
-//过滤一些关键词
-var fitter = function (txt) {
-    txt = txt.replace(/[\ |\[|\]]/g, "");
+// 过滤一些关键词
+var fitter = function (txt, ty) {
+    if (ty === 0) {
+        txt = txt.replace(/[\s[\]]/g, '');
+    }
+    if (ty === 1) {
+        txt = txt.replace(/[\s[\]*]/g, '');
+    }
     return txt;
 };
-//判断error
+// 判断error
 var isError = function (element, index, array) {
-    return (element == null);
+    return (element === null);
 };
-//添加问答...
+// 添加问答...
 api.command(/^\.问(.*)答(.*)$/, function (m, e, reply) { return __awaiter(void 0, void 0, void 0, function () {
     var word, wd1, wd2, i;
     return __generator(this, function (_a) {
+        if (!isAdmin(e.username) && e.username !== config_1.default.app.master)
+            return [2 /*return*/];
         word = getWord();
-        wd1 = m[1];
-        wd2 = m[2];
-        wd1 = fitter(wd1);
+        wd1 = m[1] // 问后面的内容
+        ;
+        wd2 = m[2] // 答后面的内容
+        ;
+        wd1 = fitter(wd1, 0);
         if (word[wd1] == null) {
             word[wd1] = [];
         }
-        i = word[wd1].push(wd2);
-        update(word);
-        reply("添加成功,当前序列为" + i, config_1.default.app.color);
+        i = word[wd1].push(wd2) // 新增对象（属性
+        ;
+        update(word, 'word');
+        reply('添加成功,当前序列为' + i, config_1.default.app.color);
         return [2 /*return*/];
     });
 }); });
-//删除部分问答
+// 删除部分问答
 api.command(/^\.删问(.*)序[号|列](.*)$/, function (m, e, reply) { return __awaiter(void 0, void 0, void 0, function () {
     var word, wd1, wd2, passed;
     return __generator(this, function (_a) {
+        if (!isAdmin(e.username) && e.username !== config_1.default.app.master)
+            return [2 /*return*/];
         word = getWord();
-        wd1 = m[1];
+        wd1 = m[1] // 问后面的内容
+        ;
         wd2 = Number(m[2]) - 1;
-        wd1 = fitter(wd1);
+        wd1 = fitter(wd1, 0);
         word[wd1].splice(wd2, 1);
         passed = word[wd1].every(isError);
-        if (passed == true) {
+        if (passed === true) {
             delete word[wd1];
         }
-        update(word);
-        reply("删除成功", config_1.default.app.color);
+        update(word, 'word');
+        reply('删除成功', config_1.default.app.color);
         return [2 /*return*/];
     });
 }); });
-//查看词库list
+// 查看词库list
 api.command(/^\.问表(.*)$/, function (m, e, reply) { return __awaiter(void 0, void 0, void 0, function () {
     var word, wd1, ran, _i, _a, list;
     return __generator(this, function (_b) {
+        if (!isAdmin(e.username) && e.username !== config_1.default.app.master)
+            return [2 /*return*/];
         word = getWord();
         wd1 = m[1];
+        wd1 = fitter(wd1, 0);
         ran = 0;
         for (_i = 0, _a = word[wd1]; _i < _a.length; _i++) {
             list = _a[_i];
             ran++;
-            reply(ran + ":" + list, config_1.default.app.color);
+            reply(ran + ':' + list, config_1.default.app.color);
         }
         return [2 /*return*/];
     });
 }); });
-//删除一整个回复
+// 删除一整个回复
 api.command(/^\.删全问(.*)$/, function (m, e, reply) { return __awaiter(void 0, void 0, void 0, function () {
     var wd1, word;
     return __generator(this, function (_a) {
-        wd1 = m[1];
+        if (!isAdmin(e.username) && e.username !== config_1.default.app.master)
+            return [2 /*return*/];
+        wd1 = m[1] // 问后面的内容
+        ;
         word = getWord();
-        wd1 = fitter(wd1);
+        wd1 = fitter(wd1, 0);
         delete word[wd1];
-        update(word);
-        reply("删除成功", config_1.default.app.color);
+        update(word, 'word');
+        reply('删除成功', config_1.default.app.color);
         return [2 /*return*/];
     });
 }); });
-//关键词回复
-api.command(/^(.*)$/, function (m, e, reply) { return __awaiter(void 0, void 0, void 0, function () {
-    var word, wd1, ran, rd;
+// 关键词回复
+api.Event.on('PublicMessage', function (msg) {
+    if (msg.username === config_1.default.account.username)
+        return; // 不响应自己发送的消息
+    var word = getWord();
+    var wd1 = msg.message.trim();
+    var reply = api.method.sendPublicMessage;
+    wd1 = fitter(wd1, 0);
+    if (word[wd1] != null) {
+        var ran = word[wd1].length;
+        var rd = random(0, ran - 1);
+        reply(word[wd1][rd], config_1.default.app.color);
+    }
+});
+// 饼修改的部分：
+api.command(/^.添加权限(.*)$/, function (m, e, reply) { return __awaiter(void 0, void 0, void 0, function () {
+    var allowed, added;
     return __generator(this, function (_a) {
-        word = getWord();
-        wd1 = m[1];
-        wd1 = fitter(wd1);
-        if (word[wd1] != null) {
-            ran = word[wd1].length;
-            rd = random(0, ran - 1);
-            reply(word[wd1][rd], config_1.default.app.color);
-        }
+        allowed = getOp();
+        if (e.username !== config_1.default.app.master)
+            return [2 /*return*/];
+        added = m[1];
+        added = fitter(added, 1);
+        allowed.op.push(added);
+        update(allowed, 'op');
+        reply('权限添加成功', config_1.default.app.color);
+        return [2 /*return*/];
+    });
+}); });
+api.command(/^移除权限(.*)$/, function (m, e, reply) { return __awaiter(void 0, void 0, void 0, function () {
+    var allowed, username;
+    return __generator(this, function (_a) {
+        allowed = getOp();
+        if (e.username !== config_1.default.app.master)
+            return [2 /*return*/];
+        username = m[1];
+        username = fitter(username, 1);
+        // 找到并删除。
+        allowed.op.forEach(function (item, index, arr) {
+            if (item === username) {
+                allowed.op.splice(index, 1);
+            }
+        });
+        update(allowed, 'op');
+        // 将username写到一个json里...然后我研究下怎么写json...哎。
+        reply('权限移除成功', config_1.default.app.color);
         return [2 /*return*/];
     });
 }); });
