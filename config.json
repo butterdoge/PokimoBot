@@ -1,0 +1,19 @@
+{
+    "app": {
+        "nickname": "屑饼子",
+        "master": "苏丙",
+        "master_uid": "5ec00d7dcb8da",
+        "color": "66ccff"
+    },
+    "chat": {
+        "disable": true
+    },
+    "account": {
+        "username": "Sleepy Princess",
+        "password": "15b4fc3b53540973b9f1e6ad2b398506",
+        "room": "605f165259fc6"
+    },
+    "logger": {
+        "level": "INFO"
+    }
+}
