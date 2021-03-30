@@ -87,6 +87,7 @@ exports.default = (function (message) {
                             title: tmp[9] === "'108" ? "花瓣" : tmp[9],
                             room: tmp[10]
                         };
+                        // 触发消息时传入额外的参数。
                         event_1.Bot.emit("LeaveRoom", msg);
                     }
                 }

@@ -64,7 +64,7 @@ var api = __importStar(require("../../lib/api"));
 var config_1 = __importDefault(require("../../config"));
 var logger_1 = __importDefault(require("../../lib/logger"));
 try {
-    fs_1.default.mkdirSync(path_1.default.join(__dirname, '../../data/word'));
+    fs_1.default.mkdirSync(path_1.default.join(__dirname, "../../data/word"));
 }
 catch (error) { }
 // 是否为管理员
@@ -79,46 +79,48 @@ var isAdmin = function (name) {
 };
 // 获取词库列表
 var getWord = function () {
-    var wordPath = path_1.default.join(__dirname, '../../data/word/word.json');
+    var wordPath = path_1.default.join(__dirname, "../../data/word/word.json");
     if (!fs_1.default.existsSync(wordPath)) {
-        fs_1.default.writeFileSync(wordPath, '{}');
-        console.log('测试成功');
+        fs_1.default.writeFileSync(wordPath, "{}");
+        console.log("测试成功");
     }
     return JSON.parse(fs_1.default.readFileSync(wordPath).toString());
 };
 // 获取权限列表
 var getOp = function () {
-    var opPath = path_1.default.join(__dirname, '../../data/word/op.json');
+    var opPath = path_1.default.join(__dirname, "../../data/word/op.json");
     if (!fs_1.default.existsSync(opPath)) {
         fs_1.default.writeFileSync(opPath, '{"op":[]}');
     }
     return JSON.parse(fs_1.default.readFileSync(opPath).toString());
 };
 // 苏苏的随机数生成姬
-var random = function (n, m) { return Math.floor(Math.random() * (m - n + 1) + n); };
+var random = function (n, m) {
+    return Math.floor(Math.random() * (m - n + 1) + n);
+};
 // 更新json文件
 var update = function (file, tyf) {
     try {
         fs_1.default.writeFileSync(path_1.default.join(__dirname, "../../data/word/" + tyf + ".json"), JSON.stringify(file, null, 3));
-        logger_1.default('Word').info('词库文件写入成功');
+        logger_1.default("Word").info("词库文件写入成功");
     }
     catch (error) {
-        logger_1.default('Word').warn('词库文件写入失败', error);
+        logger_1.default("Word").warn("词库文件写入失败", error);
     }
 };
 // 过滤一些关键词
 var fitter = function (txt, ty) {
     if (ty === 0) {
-        txt = txt.replace(/[\s[\]]/g, '');
+        txt = txt.replace(/[\s[\]]/g, "");
     }
     if (ty === 1) {
-        txt = txt.replace(/[\s[\]*]/g, '');
+        txt = txt.replace(/[\s[\]*]/g, "");
     }
     return txt;
 };
 // 判断error
 var isError = function (element, index, array) {
-    return (element === null);
+    return element === null;
 };
 // 添加问答...
 api.command(/^\.问(.*)答(.*)$/, function (m, e, reply) { return __awaiter(void 0, void 0, void 0, function () {
@@ -127,18 +129,15 @@ api.command(/^\.问(.*)答(.*)$/, function (m, e, reply) { return __awaiter(void
         if (!isAdmin(e.username) && e.username !== config_1.default.app.master)
             return [2 /*return*/];
         word = getWord();
-        wd1 = m[1] // 问后面的内容
-        ;
-        wd2 = m[2] // 答后面的内容
-        ;
+        wd1 = m[1];
+        wd2 = m[2];
         wd1 = fitter(wd1, 0);
         if (word[wd1] == null) {
             word[wd1] = [];
         }
-        i = word[wd1].push(wd2) // 新增对象（属性
-        ;
-        update(word, 'word');
-        reply('添加成功,当前序列为' + i, config_1.default.app.color);
+        i = word[wd1].push(wd2);
+        update(word, "word");
+        reply("添加成功,当前序列为" + i, config_1.default.app.color);
         return [2 /*return*/];
     });
 }); });
@@ -149,8 +148,7 @@ api.command(/^\.删问(.*)序[号|列](.*)$/, function (m, e, reply) { return __
         if (!isAdmin(e.username) && e.username !== config_1.default.app.master)
             return [2 /*return*/];
         word = getWord();
-        wd1 = m[1] // 问后面的内容
-        ;
+        wd1 = m[1];
         wd2 = Number(m[2]) - 1;
         wd1 = fitter(wd1, 0);
         word[wd1].splice(wd2, 1);
@@ -158,8 +156,8 @@ api.command(/^\.删问(.*)序[号|列](.*)$/, function (m, e, reply) { return __
         if (passed === true) {
             delete word[wd1];
         }
-        update(word, 'word');
-        reply('删除成功', config_1.default.app.color);
+        update(word, "word");
+        reply("删除成功", config_1.default.app.color);
         return [2 /*return*/];
     });
 }); });
@@ -176,7 +174,7 @@ api.command(/^\.问表(.*)$/, function (m, e, reply) { return __awaiter(void 0, 
         for (_i = 0, _a = word[wd1]; _i < _a.length; _i++) {
             list = _a[_i];
             ran++;
-            reply(ran + ':' + list, config_1.default.app.color);
+            reply(ran + ":" + list, config_1.default.app.color);
         }
         return [2 /*return*/];
     });
@@ -187,30 +185,28 @@ api.command(/^\.删全问(.*)$/, function (m, e, reply) { return __awaiter(void 
     return __generator(this, function (_a) {
         if (!isAdmin(e.username) && e.username !== config_1.default.app.master)
             return [2 /*return*/];
-        wd1 = m[1] // 问后面的内容
-        ;
+        wd1 = m[1];
         word = getWord();
         wd1 = fitter(wd1, 0);
         delete word[wd1];
-        update(word, 'word');
-        reply('删除成功', config_1.default.app.color);
+        update(word, "word");
+        reply("删除成功", config_1.default.app.color);
         return [2 /*return*/];
     });
 }); });
 // 关键词回复
-api.Event.on('PublicMessage', function (msg) {
-    if (msg.username === config_1.default.account.username)
-        return; // 不响应自己发送的消息
-    var word = getWord();
-    var wd1 = msg.message.trim();
-    var reply = api.method.sendPublicMessage;
-    wd1 = fitter(wd1, 0);
-    if (word[wd1] != null) {
-        var ran = word[wd1].length;
-        var rd = random(0, ran - 1);
-        reply(word[wd1][rd], config_1.default.app.color);
-    }
-});
+// api.Event.on("PublicMessage", (msg) => {
+//   if (msg.username === config.account.username) return; // 不响应自己发送的消息
+//   const word = getWord();
+//   let wd1: string = msg.message.trim();
+//   const reply = api.method.sendPublicMessage;
+//   wd1 = fitter(wd1, 0);
+//   if (word[wd1] != null) {
+//     const ran: number = word[wd1].length;
+//     const rd: number = random(0, ran - 1);
+//     reply(word[wd1][rd], config.app.color);
+//   }
+// });
 // 饼修改的部分：
 api.command(/^.添加权限(.*)$/, function (m, e, reply) { return __awaiter(void 0, void 0, void 0, function () {
     var allowed, added;
@@ -221,8 +217,8 @@ api.command(/^.添加权限(.*)$/, function (m, e, reply) { return __awaiter(voi
         added = m[1];
         added = fitter(added, 1);
         allowed.op.push(added);
-        update(allowed, 'op');
-        reply('权限添加成功', config_1.default.app.color);
+        update(allowed, "op");
+        reply("权限添加成功", config_1.default.app.color);
         return [2 /*return*/];
     });
 }); });
@@ -240,9 +236,77 @@ api.command(/^移除权限(.*)$/, function (m, e, reply) { return __awaiter(void
                 allowed.op.splice(index, 1);
             }
         });
-        update(allowed, 'op');
+        update(allowed, "op");
         // 将username写到一个json里...然后我研究下怎么写json...哎。
-        reply('权限移除成功', config_1.default.app.color);
+        reply("权限移除成功", config_1.default.app.color);
         return [2 /*return*/];
     });
 }); });
+// 基于正则表达式的扩展。
+// 用一个数组装一个所有匹配到的正则表达式结果随机回复。
+// 预计也是一个对象的数组，每一个对象存储一个匹配表达式和若干个答复。
+//返回一个对象，这个对象包含若干个键，每个键是关键词，每个键存储一个数组为回复;
+var getWordReg = function () {
+    var wordPath = path_1.default.join(__dirname, "../../data/word/wordreg.json");
+    if (!fs_1.default.existsSync(wordPath)) {
+        fs_1.default.writeFileSync(wordPath, "{}");
+        console.log("测试成功");
+    }
+    return JSON.parse(fs_1.default.readFileSync(wordPath).toString());
+};
+// 添加问答...
+api.command(/^\.扩展问(.*)答(.*)$/, function (m, e, reply) { return __awaiter(void 0, void 0, void 0, function () {
+    var wordreg, reg1, responce, i;
+    return __generator(this, function (_a) {
+        if (!isAdmin(e.username) && e.username !== config_1.default.app.master)
+            return [2 /*return*/];
+        wordreg = getWordReg();
+        reg1 = m[1];
+        responce = m[2];
+        //wd1 = fitter(wd1, 0) 我没有弄懂为什么需要用fitter，不过我暂时先忽略这一部分。
+        if (wordreg[reg1] == null) {
+            wordreg[reg1] = [];
+        }
+        i = wordreg[reg1].push(responce);
+        update(wordreg, "wordreg");
+        reply("添加正则匹配成功,当前序列为" + i, config_1.default.app.color);
+        return [2 /*return*/];
+    });
+}); });
+api.Event.on("PublicMessage", function (msg) {
+    if (msg.username === config_1.default.account.username)
+        return; // 不响应自己发送的消息
+    var word = getWord();
+    var wd1 = msg.message.trim();
+    var reply = api.method.sendPublicMessage;
+    wd1 = fitter(wd1, 0);
+    // 如果存在完整匹配。
+    if (word[wd1] != null) {
+        var ran = word[wd1].length;
+        var rd = random(0, ran - 1);
+        reply(word[wd1][rd], config_1.default.app.color);
+    }
+    else {
+        //如果不存在完整匹配。
+        var responces = [];
+        var wordreg = getWordReg();
+        for (var key in wordreg) {
+            var changedkey = "^" + key + "$";
+            var currentReg = new RegExp(changedkey);
+            // test就好，暂时不准备让蔷薇用户传入()形式的来加以利用。
+            if (currentReg.test(msg.message)) {
+                // push可以接受一个数组。
+                var i = 0;
+                while (i < wordreg[key].length) {
+                    responces.push(wordreg[key][i]);
+                    i++;
+                }
+            }
+        }
+        var successes = responces.length;
+        if (successes != 0) {
+            var rand = random(0, successes - 1);
+            reply(responces[rand], config_1.default.app.color);
+        }
+    }
+});
