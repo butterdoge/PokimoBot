@@ -1,17 +1,19 @@
 {
-    "name": "Omikuji神社求签",
-    "id": "Omikuji",
-    "main": "index",
-    "author": {
-      "name": "苏丙",
-      "github": "Butterdoge",
-      "iirose": "苏丙"
-    },
-    "intro": [
-      "可以像在神社里一样，求得一份神签来占卜凶吉。"
-    ],
-    "commands": [{
+  "name": "Omikuji神社求签",
+  "id": "Omikuji",
+  "main": "index",
+  "author": {
+    "name": "苏丙",
+    "github": "Butterdoge",
+    "iirose": "苏丙"
+  },
+  "intro": [
+    "可以像在神社里一样，求得一份神签来占卜凶吉。"
+  ],
+  "commands": [
+    {
       "cmd": "我要抽神签",
       "helper": "发出之后就可以随机从100张神签里抽出一张来占卜凶吉。"
-    }]
-  }
+    }
+  ]
+}
